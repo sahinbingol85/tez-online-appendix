@@ -25,11 +25,10 @@ selection = st.sidebar.radio("Go to:",
                               "Appendix G: Supplementary Tables & Graphs"])
 
 
-# --- DATA LOADING FUNCTION (UPDATED FOR SAME FOLDER) ---
+# --- DATA LOADING FUNCTION ---
 @st.cache_data
 def load_data(file_name, header_arg=0):
-    # Dosyalar artık data/ klasöründe değil, app.py ile aynı yerde.
-    # Bu yüzden doğrudan dosya adını kullanıyoruz.
+    # Dosyalar app.py ile aynı klasörde aranıyor
     file_path = file_name
 
     if not os.path.exists(file_path):
@@ -100,7 +99,7 @@ elif selection == "Appendix F: Derivation Process & Thresholds":
 
     file_name = "derivation_threshold.xlsx"
 
-    # İki satırlı başlık yapısını koruyoruz
+    # İki satırlı başlık yapısı [0, 1]
     df = load_data(file_name, header_arg=[0, 1])
 
     if df is not None:
@@ -116,9 +115,11 @@ elif selection == "Appendix F: Derivation Process & Thresholds":
     else:
         st.warning(f"⚠️ File '{file_name}' not found. Please ensure it is in the same folder as app.py.")
 
-# --- 4. APPENDIX G ---
+# --- 4. APPENDIX G (UPDATED TITLE) ---
 elif selection == "Appendix G: Supplementary Tables & Graphs":
-    st.header("📂 Appendix G: Supplementary Tables & Estimates")
+    # --- YENİ BAŞLIK ---
+    st.header("📂 Appendix G: Province-Specific Estimates of Zero-Age Populations and Time-Series Trends")
+
     st.markdown(
         "This section presents the final **zero-age population estimates** derived using the Ratio-Based PDC Reconstruction Method.")
 
