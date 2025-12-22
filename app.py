@@ -25,15 +25,16 @@ selection = st.sidebar.radio("Go to:",
                               "Appendix G: Supplementary Tables & Graphs"])
 
 
-# --- DATA LOADING FUNCTION (UPDATED) ---
-# header parametresi eklendi: Bazı dosyalar (Appx F gibi) çok satırlı başlığa sahip olabilir.
+# --- DATA LOADING FUNCTION (UPDATED FOR SAME FOLDER) ---
 @st.cache_data
 def load_data(file_name, header_arg=0):
-    file_path = f"data/{file_name}"
+    # Dosyalar artık data/ klasöründe değil, app.py ile aynı yerde.
+    # Bu yüzden doğrudan dosya adını kullanıyoruz.
+    file_path = file_name
+
     if not os.path.exists(file_path):
         return None
     try:
-        # header_arg varsayılan olarak 0 (ilk satır), ama Appendix F için [0,1] göndereceğiz.
         df = pd.read_excel(file_path, header=header_arg)
         return df
     except Exception as e:
@@ -88,9 +89,9 @@ elif selection == "Appendix E: Harmonized Mortality Data":
             mime="text/csv"
         )
     else:
-        st.warning(f"⚠️ File '{file_name}' not found. Please ensure it is located in the 'data' folder.")
+        st.warning(f"⚠️ File '{file_name}' not found. Please ensure it is in the same folder as app.py.")
 
-# --- 3. APPENDIX F (UPDATED FOR MULTI-ROW HEADER) ---
+# --- 3. APPENDIX F ---
 elif selection == "Appendix F: Derivation Process & Thresholds":
     st.header("📂 Appendix F: Derivation Process and Threshold Choices")
     st.markdown(
@@ -99,14 +100,13 @@ elif selection == "Appendix F: Derivation Process & Thresholds":
 
     file_name = "derivation_threshold.xlsx"
 
-    # header=[0, 1] kullanarak ilk iki satırı başlık olarak okuyoruz.
-    # Böylece "TOTAL POPULATION" altındaki "TOTAL | MALE | FEMALE" yapısı bozulmaz.
+    # İki satırlı başlık yapısını koruyoruz
     df = load_data(file_name, header_arg=[0, 1])
 
     if df is not None:
         st.dataframe(df, use_container_width=True)
 
-        csv = df.to_csv(index=True).encode('utf-8')  # MultiIndex olduğu için index yapısını koruyoruz
+        csv = df.to_csv(index=True).encode('utf-8')
         st.download_button(
             label="💾 Download Data (CSV)",
             data=csv,
@@ -114,9 +114,9 @@ elif selection == "Appendix F: Derivation Process & Thresholds":
             mime="text/csv"
         )
     else:
-        st.warning(f"⚠️ File '{file_name}' not found. Please ensure it is located in the 'data' folder.")
+        st.warning(f"⚠️ File '{file_name}' not found. Please ensure it is in the same folder as app.py.")
 
-# --- 4. APPENDIX G (PREVIOUSLY UPDATED) ---
+# --- 4. APPENDIX G ---
 elif selection == "Appendix G: Supplementary Tables & Graphs":
     st.header("📂 Appendix G: Supplementary Tables & Estimates")
     st.markdown(
@@ -149,11 +149,11 @@ elif selection == "Appendix G: Supplementary Tables & Graphs":
                 "Select a level (province or national) below to visualize the zero-age population estimates over time.")
 
             # --- COLUMN SETTINGS ---
-            col_province = 'LEVEL'  # Appendix G dosyasındaki başlık
+            col_province = 'LEVEL'
             col_year = 'YEAR'
             col_value = 'TOTAL'
 
-            # Sütun başlıklarını standardize et (Büyük harf)
+            # Başlıkları büyük harfe çevir
             df.columns = [str(c).upper() for c in df.columns]
 
             if col_province in df.columns and col_year in df.columns:
@@ -163,7 +163,6 @@ elif selection == "Appendix G: Supplementary Tables & Graphs":
 
                 filtered_df = df[df[col_province] == selected_province]
 
-                # Çizilecek sütunları belirle
                 y_columns = []
                 if 'TOTAL' in df.columns: y_columns.append('TOTAL')
                 if 'MALE' in df.columns: y_columns.append('MALE')
@@ -193,4 +192,4 @@ elif selection == "Appendix G: Supplementary Tables & Graphs":
                     f"Column mismatch! Expected '{col_province}' and '{col_year}'. Found in file: {list(df.columns)}")
 
     else:
-        st.warning(f"⚠️ File '{file_name}' not found. Please ensure it is located in the 'data' folder.")
+        st.warning(f"⚠️ File '{file_name}' not found. Please ensure it is in the same folder as app.py.")
